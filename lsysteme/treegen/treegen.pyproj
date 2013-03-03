@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>ca1125fe-2664-4421-960a-7d3280a13ddf</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>treegen.py</StartupFile>
+    <StartupFile>bracketed_turtle2d_test.py</StartupFile>
     <SearchPath>C:\Program Files (x86)\Panda3D-1.7.2\;C:\Program Files (x86)\Panda3D-1.7.2\bin\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -25,6 +25,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="bracketed_lsystem.py" />
+    <Compile Include="bracketed_turtle2d.py" />
+    <Compile Include="bracketed_turtle2d_test.py" />
     <Compile Include="lsystem.py" />
     <Compile Include="panda3dtest.py" />
     <Compile Include="panda3dtest_customgeo.py" />

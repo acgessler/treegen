@@ -4,7 +4,8 @@ from lsystem import lsystem
 
 class bracketed_lsystem(lsystem):
     """Bracketed Lindenmayer system. Same as lystem class except that
-    it retains alphabet symbols for which there are no productions.
+    it retains alphabet symbols for which there are no productions,
+    thus is can be used with bracketed turtle dialects :-)
     """
 
     def __init__(self, rules, axiom):
