@@ -7,39 +7,45 @@ class lsystem:
     it to a given axiom, forming self-similar structures.
     """
 
-    def __init__(rules, axioms):
+    def __init__(self, rules, axiom):
         """
         Init LSystem given axioms and production rules.
 
         Parameters:
 
         rules:
-            list of 2-tuples (a,b) of the productions a->b.
-            every production lefts-side may only occur once.
+            dictionary of the productions a->b.
 
         axioms:
             axiom to start with
         """
         self.rules = rules
-        self.axioms = axioms
+        self.axiom = axiom
 
-        assert(isinstance(self.rules,list))
-        assert(isinstance(self.axioms,str))
-
-        assert(len(set(a for (a,b) in rules)) == len(rules))
+        assert(isinstance(self.rules,dict) and len(self.rules))
+        assert(isinstance(self.axiom,str))
 
 
-    def evaluate(iterations):
+
+    def evaluate(self, iterations):
         assert(iterations >= 0)
-        
+
+        return self._rec_eval(iterations, self.axiom)
+
+    def _rec_eval(self, iterations, word):
+        if iterations == 0:
+            return word
+
+        out = []
+        for a in word:
+            out.append(self._rec_eval(iterations-1,self.rules[a]))
+
+        return ''.join(out)
 
 
 def test():
-    ls = lsystem(
-                 [('a','ab'),('b','a')],'b'
-                 )
-
-    ls.evaluate(5)
+    ls = lsystem( { 'a' : 'ab', 'b' : 'a'},'b')
+    print(ls.evaluate(2))
 
 if __name__ == '__main__':
     test()
