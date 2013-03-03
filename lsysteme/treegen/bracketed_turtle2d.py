@@ -59,8 +59,7 @@ class bracketed_turtle2d:
             processed += 1
             c = program[n]
             if c == 'F':          
-                xs = x + self.d * math.cos(theta)
-                ys = y + self.d * math.sin(theta)
+                xs,ys = self._compute_next(x,y,theta)               
                 output.append((x,y,xs,ys))
                 x = xs
                 y = ys
@@ -79,5 +78,11 @@ class bracketed_turtle2d:
             n += 1
 
         return processed
+
+
+    def _compute_next(self, x, y, theta):
+        xs = x + self.d * math.cos(theta)
+        ys = y + self.d * math.sin(theta)
+        return xs,ys
 
 

@@ -30,7 +30,6 @@ class TestApp(ShowBase):
 
         vdata = GeomVertexData('name', GeomVertexFormat.getV3(), Geom.UHStatic)
 
-
         ls = stochastic_lsystem([('F','F[+F]F[-F]F',0.333),
             ('F','F[+F]F',0.333),
             ('F','F[-F]F',0.333)], 'F' )
