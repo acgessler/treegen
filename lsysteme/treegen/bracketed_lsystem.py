@@ -31,20 +31,20 @@ class bracketed_lsystem(lsystem):
         """
         assert(n >= 0)
 
-        return self._rec_eval(n, self.axiom)
+        return ''.join(self._rec_eval(n, self.axiom, []))
 
-    def _rec_eval(self, iterations, word):
+    def _rec_eval(self, iterations, word, out):
         if iterations == 0:
-            return word
+            out.append(word)
+            return out
 
-        out = []
         for a in word:
             if not a in self.rules:
                 out.append(a)      
             else:
-                out.append(self._rec_eval(iterations-1,self.rules[a]))
+                self._rec_eval(iterations-1,self.rules[a],out)
 
-        return ''.join(out)
+        return out
 
 
 def test():
