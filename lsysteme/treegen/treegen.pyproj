@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>ca1125fe-2664-4421-960a-7d3280a13ddf</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>bracketed_turtle2d_test.py</StartupFile>
+    <StartupFile>stochastic_lsystem.py</StartupFile>
     <SearchPath>C:\Program Files (x86)\Panda3D-1.7.2\;C:\Program Files (x86)\Panda3D-1.7.2\bin\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -30,6 +30,7 @@
     <Compile Include="lsystem.py" />
     <Compile Include="panda3dtest.py" />
     <Compile Include="panda3dtest_customgeo.py" />
+    <Compile Include="stochastic_lsystem.py" />
     <Compile Include="treegen.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
