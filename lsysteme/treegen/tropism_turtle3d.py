@@ -93,7 +93,7 @@ class tropism_turtle3d:
             ([(Vec3 start,Vec3 end)] output_lines, [(Vec3 vertex)] output_polygons)
         """
 
-        # obtain a quaternion representation of the initial turtle orientation
+        # build a coordinate space based on the two given vectors
         start = Point3(*start) \
             if not isinstance(start, Point3) else start
 
@@ -102,17 +102,20 @@ class tropism_turtle3d:
      
         start_right = Vec3(*start_right) \
             if not isinstance(start, Vec3) else start_right
-
         start_up = -start_forward.cross(start_right)
 
-        all_nonzero = start_forward.normalize() and start_up.normalize() and start_right.normalize()
+        # obtain a orthonormal system
+        all_nonzero = start_forward.normalize() and \
+            start_up.normalize() and \
+            start_right.normalize()
+
         assert all_nonzero
 
+        # obtain a quaternion representation of the ONS
         orient = Mat3()
         orient.setRow(0, start_right)
         orient.setRow(1, start_up)
         orient.setRow(2, start_forward)
-
         quat = LOrientationf(orient)
 
         output_lines = [] # of (Vec3, Vec3)
@@ -182,9 +185,18 @@ class tropism_turtle3d:
                 if not is_poly:
                     raise "unmatched } not allowed"
                 is_poly = False
-                if len(current_poly):
-                    output_polygons.append(tuple(current_poly))
 
+                # drop duplicate end points
+                if current_poly and current_poly[-1].almostEqual(current_poly[0]):
+                    current_poly = current_poly[:-1]
+
+                # ignore anything less than a triangle
+                if len(current_poly) >= 3:
+                    output_polygons.append(tuple(current_poly))
+                else:
+                    print "ignoring degenerate polygon (line, point or empty)"
+
+            # ignore anything else - i.e. unconsumed grammar symbols
             #else:
                 #raise ("unknown turtle command: " + c)
                 #continue

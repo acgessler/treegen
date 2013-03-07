@@ -1,18 +1,22 @@
-from direct.showbase.ShowBase import ShowBase
 
+# p3d
+from direct.showbase.ShowBase import ShowBase
 from direct.showbase import DirectObject
 from panda3d.core import *
 
 from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.ShowBase import ShowBase
 
-from tropism_turtle3d import tropism_turtle3d
-from stochastic_lsystem import stochastic_lsystem
-
+# pystd
 import itertools
 import math
 
+# own stuff
 import util
+
+from tropism_turtle3d import tropism_turtle3d
+from stochastic_lsystem import stochastic_lsystem
+
 
 # lsystem + turtle parameters
 d_line = 10
@@ -47,7 +51,7 @@ class TestApp(ShowBase):
         base.setBackgroundColor(0.0, 0.0, 0.0) 
         base.disableMouse()
 
-        vdata = GeomVertexData('name', GeomVertexFormat.getV3(), Geom.UHStatic)        
+           
 
         turtle = tropism_turtle3d(d_line, d_poly,angles,trop,e)
         evaluated = ls.evaluate(iterations)
@@ -59,21 +63,49 @@ class TestApp(ShowBase):
         vmin, vmax = util.find_aabb(itertools.chain(*lines))   
         center = (vmin+vmax)*0.5    
 
+        # generate geometry objects to draw the stem lines
+        vdata = GeomVertexData('lines', GeomVertexFormat.getV3(), Geom.UHStatic)     
         vertex = GeomVertexWriter(vdata, 'vertex')
         for v1,v2 in lines:          
             vertex.addData3f(v1 - center)
             vertex.addData3f(v2 - center)
 
         geom = Geom(vdata)
+        prim = GeomLines(Geom.UHStatic)
         for i in xrange(len(lines)):
-            prim = GeomLines(Geom.UHStatic)
             prim.addVertex(i*2)
             prim.addVertex(i*2+1)
             prim.closePrimitive()
-            geom.addPrimitive(prim)
- 
-        node = GeomNode('test_tri')
+        geom.addPrimitive(prim)
+
+       
+        # generate geometry objects to draw the leaves
+        # save full triangulation, for the current leaf topology a trifan is enough
+        n = 0
+        prim = GeomTriangles(Geom.UHStatic)
+        vdata = GeomVertexData('polys', GeomVertexFormat.getV3(), Geom.UHStatic)     
+        vertex = GeomVertexWriter(vdata, 'vertex')
+
+        for poly in polygons:
+            assert len(poly) >= 3
+            for v in poly:
+                vertex.addData3f(v - center)
+
+        for poly in polygons:          
+            for i in xrange(1, len(poly) - 1):
+                prim.addVertex(n)
+                prim.addVertex(n + i)
+                prim.addVertex(n + i + 1)
+                prim.closePrimitive()
+            n += len(poly)
+        
+        geom_poly = Geom(vdata)
+        geom_poly.addPrimitive(prim)
+            
+        # and attach both geometry objects to a fresh scenegraph node
+        node = GeomNode('tree_anchor')
         node.addGeom(geom)
+        node.addGeom(geom_poly)
      
         nodePath = render.attachNewNode(node)
         nodePath.setPos(0,0,0)
