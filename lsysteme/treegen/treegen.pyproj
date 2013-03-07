@@ -36,6 +36,7 @@
     <Compile Include="stochastic_tropism_turtle3d_test.py" />
     <Compile Include="treegen.py" />
     <Compile Include="tropism_turtle3d.py" />
+    <Compile Include="util.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>

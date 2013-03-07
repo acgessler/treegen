@@ -1,6 +1,5 @@
 from direct.showbase.ShowBase import ShowBase
 
-
 from direct.showbase import DirectObject
 from panda3d.core import *
 
@@ -10,7 +9,10 @@ from direct.showbase.ShowBase import ShowBase
 from tropism_turtle3d import tropism_turtle3d
 from stochastic_lsystem import stochastic_lsystem
 
+import itertools
 import math
+
+import util
 
 d = 10
 angles = (22.5,22.5,22.5)
@@ -26,9 +28,9 @@ class TestApp(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
 
-        title = OnscreenText(text="stochastic_lsystem w/ 3d tropism turtle paint",
+        title = OnscreenText(text="bracketed, stochastic lsystem with tropism + 3D turtle paint",
                        style=1, fg=(1,1,1,1),
-                       pos=(0.6,-0.95), scale = .07)
+                       pos=(0.2,-0.95), scale = .07)
 
         base.setBackgroundColor(0.0, 0.0, 0.0) 
         base.disableMouse()
@@ -48,10 +50,14 @@ class TestApp(ShowBase):
         lines = turtle.get_3d_lines(evaluated,(0,-2,0), start_forward=(0,0,1), start_right=(1,0,0)) 
         #print lines
 
+        # center
+        vmin, vmax = util.find_aabb(itertools.chain(*lines))   
+        center = (vmin+vmax)*0.5    
+
         vertex = GeomVertexWriter(vdata, 'vertex')
         for v1,v2 in lines:          
-            vertex.addData3f(v1)
-            vertex.addData3f(v2)
+            vertex.addData3f(v1 - center)
+            vertex.addData3f(v2 - center)
 
         geom = Geom(vdata)
         for i in xrange(len(lines)):
@@ -67,9 +73,13 @@ class TestApp(ShowBase):
         nodePath = render.attachNewNode(node)
         nodePath.setPos(0,0,0)
 
-
         # orbit camera code taken from
         # http://www.panda3d.org/forums/viewtopic.php?t=9292
+
+        # hide mouse cursor, comment these 3 lines to see the cursor 
+        props = WindowProperties() 
+        props.setCursorHidden(True) 
+        base.win.requestProperties(props) 
 
         # dummy node for camera, we will rotate the dummy node fro camera rotation 
         parentnode = render.attachNewNode('camparent') 
@@ -115,19 +125,5 @@ class TestApp(ShowBase):
         nodePath.setDepthTest(False)
 
 if __name__ == '__main__':
-
-    
-
     app = TestApp()
     app.run()
-
-
-
-
-
-
-
-
-
-
-
