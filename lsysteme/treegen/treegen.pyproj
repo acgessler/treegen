@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>ca1125fe-2664-4421-960a-7d3280a13ddf</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>stochastic_tropism_turtle2d_test.py</StartupFile>
+    <StartupFile>stochastic_tropism_turtle3d_test.py</StartupFile>
     <SearchPath>C:\Program Files (x86)\Panda3D-1.7.2\;C:\Program Files (x86)\Panda3D-1.7.2\bin\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -33,7 +33,9 @@
     <Compile Include="stochastic_bracketed_turtle2d_test.py" />
     <Compile Include="stochastic_lsystem.py" />
     <Compile Include="stochastic_tropism_turtle2d_test.py" />
+    <Compile Include="stochastic_tropism_turtle3d_test.py" />
     <Compile Include="treegen.py" />
+    <Compile Include="tropism_turtle3d.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>
