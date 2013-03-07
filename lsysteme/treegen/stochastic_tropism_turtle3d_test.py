@@ -14,10 +14,22 @@ import math
 
 import util
 
-d = 10
+# lsystem + turtle parameters
+d_line = 10
+d_poly = 1
 angles = (22.5,22.5,22.5)
-trop = (0.2,-0.5,0)
-e = 0.0
+trop = (0.2,0.0,0.4)
+e = 0.3
+iterations = 6
+
+# d0 grammar to generate the tree
+ls = stochastic_lsystem([
+    ('A',   r'[&FL!A]/////[&FL!A]///////[&FL!A]',               1),
+    ('F',   r'S/////F',                                         1),
+    ('S',   r'F L',                                             1),
+    ('L',   r'[^^{-f+f+f-|-f+f+f}]',                            1)], 
+'A' )
+
 
 # global vars for camera rotation 
 heading = 0 
@@ -35,19 +47,12 @@ class TestApp(ShowBase):
         base.setBackgroundColor(0.0, 0.0, 0.0) 
         base.disableMouse()
 
-        vdata = GeomVertexData('name', GeomVertexFormat.getV3(), Geom.UHStatic)
+        vdata = GeomVertexData('name', GeomVertexFormat.getV3(), Geom.UHStatic)        
 
-        ls = stochastic_lsystem([
-            ('A',   r'[&FL!A]/////[&FL!A]///////[&FL!A]',               1),
-            ('F',   r'S/////F',                                         1),
-            ('S',   r'F L',                                             1),
-            ('L',   r'[^^-f+f+f-|-f+f+f]',                              1)], 
-        'A' )
-
-        turtle = tropism_turtle3d(d,angles,trop,e)
-        evaluated = ls.evaluate(6)
+        turtle = tropism_turtle3d(d_line, d_poly,angles,trop,e)
+        evaluated = ls.evaluate(iterations)
         #print evaluated
-        lines = turtle.get_3d_lines(evaluated,(0,-2,0), start_forward=(0,0,1), start_right=(1,0,0)) 
+        lines, polygons = turtle.get_turtle_path(evaluated,(0,-2,0), start_forward=(0,0,1), start_right=(1,0,0)) 
         #print lines
 
         # center

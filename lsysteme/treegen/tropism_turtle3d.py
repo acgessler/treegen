@@ -4,17 +4,29 @@ from panda3d.core import *
 
 class tropism_turtle3d:
     """
-    3d bracketed tropism turtle with the following commands:
+    3d bracketed tropism turtle with the following instruction set:
 
     +,-     Yaw
     &,^     Pitch
     \/      Roll
     |       Flip (yaw by 180deg)
 
-    F       Move forward
+    F       Move forward in line mode
+    f       Move forward in polygon mode
+
+    []      Branch (stack push/pop)
+    {}      Start/End polygon mode
+
+    There are two operating modes:
+       line (default)
+         The turtle generates 2D line segments
+       polygon
+         The turtle connects multiple adjacent 2D line segments
+         to form a single polygon. Triangulation is left to the 
+         caller.
     """
 
-    def __init__(self, d, angles, trop, e):
+    def __init__(self, d_line, d_polygon, angles, trop, e):
         """
         Parameters:
 
@@ -23,8 +35,11 @@ class tropism_turtle3d:
             (phi, theta, psi) 3-tuple. Angles are given in
             degrees.
 
-        d  
+        d_line
             Move distance for F
+
+        d_polygon
+            Move distance for f
 
         trop
             3-tuple of the (x,y,z) tropism vector,
@@ -37,9 +52,14 @@ class tropism_turtle3d:
             higher values mean stronger influence
             of the tropism vector on turtle movements.
         """
-        self.d = d
+        self.d_line = d_line
+        assert self.d_line > 0
+
+        self.d_polygon = d_polygon
+        assert self.d_polygon > 0
+
         self.angles = angles
-        assert(len(self.angles) == 3)
+        assert len(self.angles) == 3
    
         self.trop = Vec3(*trop) \
             if not isinstance(trop, Vec3) else trop
@@ -47,15 +67,15 @@ class tropism_turtle3d:
         self.e = e
 
 
-    def get_3d_lines(self, program, start = (0,0,0), start_forward = (0,1,0), start_right= (1,0,0)):
+    def get_turtle_path(self, program, start = (0,0,0), start_forward = (0,1,0), start_right= (1,0,0)):
         """ 
-        Get a list of (x1,y1,x2,y2) line segments for a given
-        turtle program.
+        Gets the output lines and output polygons that the turtle generates 
+        for a given turtle3d program text.
 
         Parameters:
 
         program
-            Program text to be interpreted
+            Program text to be interpreted. See class doc for the instruction set.
 
         [start]
             (x,y,z) tuple as starting position 
@@ -68,6 +88,9 @@ class tropism_turtle3d:
 
         Exceptions:
             str - For unknown input commands
+
+        Returns:
+            ([(Vec3 start,Vec3 end)] output_lines, [(Vec3 vertex)] output_polygons)
         """
 
         # obtain a quaternion representation of the initial turtle orientation
@@ -91,29 +114,41 @@ class tropism_turtle3d:
         orient.setRow(2, start_forward)
 
         quat = LOrientationf(orient)
-        output = [] # of (Vec3, Vec3)
 
-        # interpret the program, collecting lines in [output]
-        total = self._rec_eval(program, 0, start, quat, output)
+        output_lines = [] # of (Vec3, Vec3)
+        output_polygons = [] # of Vec3
+
+        # interpret the program, collecting lines and polygons in separate lists
+        total = self._rec_eval(program, 0, start, quat, output_lines, output_polygons)
         assert(total == len(program))
 
-        return output
+        return output_lines, output_polygons
 
 
-    def _rec_eval(self, program, cursor, start, quat, output):
+    def _rec_eval(self, program, cursor, start, quat, output_lines, output_polygons):
         lstart = Point3(start)
         lquat = LOrientationf(quat)
         lquat.normalize() # normalize the quat each time to prevent numerical errors
 
+        is_poly = False
+        current_poly = []
+    
         n = cursor
         processed = 0
         while n < len(program):
             processed += 1
             c = program[n]
-            if c == 'F' or c == 'f':          
-                newPoint = self._compute_next(lstart, lquat, c=='f') 
-                output.append((lstart,newPoint))
+            if c == 'F':  
+                if is_poly:
+                    raise "F not allowed while the turtle is in poly mode"        
+                newPoint = self._compute_next(lstart, lquat, True) 
+                output_lines.append((lstart,newPoint))
                 lstart = newPoint
+            elif c == 'f':          
+                if not is_poly:
+                    raise "f not allowed while the turtle is in line mode"    
+                lstart = self._compute_next(lstart, lquat, False) 
+                current_poly.append(lstart)
             elif c == '-':
                 lquat *= LRotationf(Vec3(0,1,0),-self.angles[2])
             elif c == '+':
@@ -129,11 +164,27 @@ class tropism_turtle3d:
             elif c == '|':
                 lquat *= LRotationf(Vec3(0,1,0),180)
             elif c == '[':
-                cnt = self._rec_eval(program, n + 1, lstart, lquat, output) 
+                if is_poly:
+                    raise "[ not allowed while the turtle is in poly mode"
+                cnt = self._rec_eval(program, n + 1, lstart, lquat, output_lines, output_polygons) 
                 n += cnt
                 processed += cnt
             elif c == ']':
+                if is_poly:
+                    raise "] not allowed while the turtle is in poly mode"
                 break
+            elif c == '{':
+                if is_poly:
+                    raise "nesting of { not allowed"
+                is_poly = True
+                current_poly = []
+            elif c == '}':
+                if not is_poly:
+                    raise "unmatched } not allowed"
+                is_poly = False
+                if len(current_poly):
+                    output_polygons.append(tuple(current_poly))
+
             #else:
                 #raise ("unknown turtle command: " + c)
                 #continue
@@ -143,10 +194,10 @@ class tropism_turtle3d:
         return processed
 
 
-    def _compute_next(self, lstart, lquat, small):
+    def _compute_next(self, lstart, lquat, line):
         dir = lquat.getUp() + self.trop * self.e
         dir.normalize()
-        return lstart + dir * self.d * (0.1 if small else 1.0)
+        return lstart + dir * (self.d_line if line else self.d_polygon)
         
    
 
