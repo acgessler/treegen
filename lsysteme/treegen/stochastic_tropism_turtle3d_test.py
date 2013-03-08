@@ -21,24 +21,25 @@ from stochastic_lsystem import stochastic_lsystem
 # lsystem + turtle parameters
 d_line = 10
 d_poly = 1
-angles = (22.5,22.5,22.5)
+angles = (22.5,30.5,22.5)
 trop = (0.2,0.0,0.4)
 e = 0.3
 iterations = 6
 
 # d0 grammar to generate the tree
 ls = stochastic_lsystem([
-    ('A',   r'[&FL!A]/////[&FL!A]///////[&FL!A]',               1),
-    ('F',   r'S/////F',                                         1),
-    ('S',   r'F L',                                             1),
+    ('A',   r'[&FL!A]/////[&FFL!A]///[&FL!A]',                  0.5),
+    ('A',   r'[&FL!A]/////[&FL!A]//////[&FFL!A]',               0.5),
+    ('F',   r'S/////F',                                         0.5),
+    ('F',   r'S//F',                                            0.5),
+    ('S',   r'F L',                                             0.5),
+    ('S',   r'L',                                               0.5),
     ('L',   r'[^^{-f+f+f-|-f+f+f}]',                            1)], 
 'A' )
-
 
 # global vars for camera rotation 
 heading = 0 
 pitch = 0 
-
  
 class TestApp(ShowBase):
     def __init__(self):
@@ -50,8 +51,6 @@ class TestApp(ShowBase):
 
         base.setBackgroundColor(0.0, 0.0, 0.0) 
         base.disableMouse()
-
-           
 
         turtle = tropism_turtle3d(d_line, d_poly,angles,trop,e)
         evaluated = ls.evaluate(iterations)
@@ -78,7 +77,6 @@ class TestApp(ShowBase):
             prim.closePrimitive()
         geom.addPrimitive(prim)
 
-       
         # generate geometry objects to draw the leaves
         # save full triangulation, for the current leaf topology a trifan is enough
         n = 0
@@ -102,13 +100,16 @@ class TestApp(ShowBase):
         geom_poly = Geom(vdata)
         geom_poly.addPrimitive(prim)
             
-        # and attach both geometry objects to a fresh scenegraph node
-        node = GeomNode('tree_anchor')
+        # and attach both geometry objects to fresh scenegraph nodes
+        node = GeomNode('tree_stem')
         node.addGeom(geom)
+           
+        node_path = render.attachNewNode(node)
+        node_path.setPos(0,0,0)
+
+        node = GeomNode('tree_leaves')
         node.addGeom(geom_poly)
-     
-        nodePath = render.attachNewNode(node)
-        nodePath.setPos(0,0,0)
+        node_path_leaves = node_path.attachNewNode(node)
 
         # orbit camera code taken from
         # http://www.panda3d.org/forums/viewtopic.php?t=9292
@@ -120,7 +121,7 @@ class TestApp(ShowBase):
 
         # dummy node for camera, we will rotate the dummy node fro camera rotation 
         parentnode = render.attachNewNode('camparent') 
-        parentnode.reparentTo(nodePath) # inherit transforms 
+        parentnode.reparentTo(node_path) # inherit transforms 
         parentnode.setEffect(CompassEffect.make(render)) # NOT inherit rotation 
 
         # the camera 
@@ -151,15 +152,26 @@ class TestApp(ShowBase):
 
         taskMgr.add(thirdPersonCameraTask, 'thirdPersonCameraTask')      
 
-        # set dummy material
+        # set stem material
         myMaterial = Material()
         myMaterial.setShininess(5.0) 
-        myMaterial.setAmbient(VBase4(0,1,0,1)) 
-        myMaterial.setDiffuse(VBase4(0.2,1,0.5,1))
-        nodePath.setMaterial(myMaterial)
-        nodePath.setTwoSided(True)
+        myMaterial.setAmbient(VBase4(0.1,0.1,0.1,1)) 
+        myMaterial.setDiffuse(VBase4(0.4,0.4,0.0,1))
+        node_path.setMaterial(myMaterial)
+        node_path.setTwoSided(True)
 
-        nodePath.setDepthTest(False)
+        # set leaves material
+        myMaterial = Material()
+        myMaterial.setShininess(2.0) 
+        myMaterial.setAmbient(VBase4(0.1,0.2,0.1,1)) 
+        myMaterial.setDiffuse(VBase4(0.1,0.6,0.0,1))
+        node_path_leaves.setMaterial(myMaterial)
+        node_path_leaves.setTwoSided(True)
+
+        dlight = DirectionalLight('my dlight')
+        dlnp = render.attachNewNode(dlight)
+        dlnp.setHpr(0, -60, 0)
+        render.setLight(dlnp)
 
 if __name__ == '__main__':
     app = TestApp()
