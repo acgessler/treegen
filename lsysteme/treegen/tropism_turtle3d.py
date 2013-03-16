@@ -90,7 +90,7 @@ class tropism_turtle3d:
             str - For unknown input commands
 
         Returns:
-            ([(Vec3 start,Vec3 end)] output_lines, [(Vec3 vertex)] output_polygons)
+            ([(Vec3 start,Vec3 end, int branching_level)] output_lines, [(Vec3 vertex)] output_polygons)
         """
 
         # build a coordinate space based on the two given vectors
@@ -122,13 +122,13 @@ class tropism_turtle3d:
         output_polygons = [] # of Vec3
 
         # interpret the program, collecting lines and polygons in separate lists
-        total = self._rec_eval(program, 0, start, quat, output_lines, output_polygons)
+        total = self._rec_eval(program, 0, start, quat, output_lines, output_polygons, 0)
         assert(total == len(program))
 
         return output_lines, output_polygons
 
 
-    def _rec_eval(self, program, cursor, start, quat, output_lines, output_polygons):
+    def _rec_eval(self, program, cursor, start, quat, output_lines, output_polygons, level):
         lstart = Point3(start)
         lquat = LOrientationf(quat)
         lquat.normalize() # normalize the quat each time to prevent numerical errors
@@ -145,7 +145,7 @@ class tropism_turtle3d:
                 if is_poly:
                     raise "F not allowed while the turtle is in poly mode"        
                 newPoint = self._compute_next(lstart, lquat, True) 
-                output_lines.append((lstart,newPoint))
+                output_lines.append((lstart,newPoint,level))
                 lstart = newPoint
             elif c == 'f':          
                 if not is_poly:
@@ -169,7 +169,7 @@ class tropism_turtle3d:
             elif c == '[':
                 if is_poly:
                     raise "[ not allowed while the turtle is in poly mode"
-                cnt = self._rec_eval(program, n + 1, lstart, lquat, output_lines, output_polygons) 
+                cnt = self._rec_eval(program, n + 1, lstart, lquat, output_lines, output_polygons, level + 1) 
                 n += cnt
                 processed += cnt
             elif c == ']':

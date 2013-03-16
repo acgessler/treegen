@@ -59,13 +59,13 @@ class TestApp(ShowBase):
         #print lines
 
         # center
-        vmin, vmax = util.find_aabb(itertools.chain(*lines))   
+        vmin, vmax = util.find_aabb(itertools.chain(*((a,b) for a,b,c in lines)))   
         center = (vmin+vmax)*0.5    
 
         # generate geometry objects to draw the stem lines
         vdata = GeomVertexData('lines', GeomVertexFormat.getV3(), Geom.UHStatic)     
         vertex = GeomVertexWriter(vdata, 'vertex')
-        for v1,v2 in lines:          
+        for v1,v2, nesting_level in lines:          
             vertex.addData3f(v1 - center)
             vertex.addData3f(v2 - center)
 
