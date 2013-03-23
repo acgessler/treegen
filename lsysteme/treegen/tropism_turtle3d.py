@@ -118,7 +118,7 @@ class tropism_turtle3d:
         orient.setRow(2, start_forward)
         quat = LOrientationf(orient)
 
-        output_lines = [] # of (Vec3, Vec3)
+        output_lines = [] # of (Vec3, Vec3, int)
         output_polygons = [] # of Vec3
 
         # interpret the program, collecting lines and polygons in separate lists

@@ -16,6 +16,7 @@ import util
 
 from tropism_turtle3d import tropism_turtle3d
 from stochastic_lsystem import stochastic_lsystem
+from trunk_generator import trunk_generator
 
 
 # lsystem + turtle parameters
@@ -62,20 +63,33 @@ class TestApp(ShowBase):
         vmin, vmax = util.find_aabb(itertools.chain(*((a,b) for a,b,c in lines)))   
         center = (vmin+vmax)*0.5    
 
-        # generate geometry objects to draw the stem lines
-        vdata = GeomVertexData('lines', GeomVertexFormat.getV3(), Geom.UHStatic)     
+        trunk_gen = trunk_generator(lines, thickness=2.5, thickness_decay=0.5)
+        stem_quads = trunk_gen.get_geometry()
+        
+
+        # generate geometry objects to draw the stem quads
+        vdata = GeomVertexData('stem_quads', GeomVertexFormat.getV3(), Geom.UHStatic)     
         vertex = GeomVertexWriter(vdata, 'vertex')
-        for v1,v2, nesting_level in lines:          
-            vertex.addData3f(v1 - center)
-            vertex.addData3f(v2 - center)
+        for t1,t2,t3,t4 in stem_quads:          
+            vertex.addData3f(t1 - center)
+            vertex.addData3f(t2 - center)
+            vertex.addData3f(t3 - center)
+            vertex.addData3f(t4 - center)
 
         geom = Geom(vdata)
-        prim = GeomLines(Geom.UHStatic)
-        for i in xrange(len(lines)):
-            prim.addVertex(i*2)
-            prim.addVertex(i*2+1)
+        prim = GeomTriangles(Geom.UHStatic)
+        for i in xrange(len(stem_quads)):
+            i4 = i*4
+            prim.addVertex(i4)
+            prim.addVertex(i4+1)
+            prim.addVertex(i4+2)
+            prim.closePrimitive()
+            prim.addVertex(i4+2)
+            prim.addVertex(i4+3)
+            prim.addVertex(i4)
             prim.closePrimitive()
         geom.addPrimitive(prim)
+        
 
         # generate geometry objects to draw the leaves
         # save full triangulation, for the current leaf topology a trifan is enough
