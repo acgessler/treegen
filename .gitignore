@@ -1,3 +1,4 @@
 # git ignore file
 _ReSharper*/
 *.pyc
+*.suo
