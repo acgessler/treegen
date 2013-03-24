@@ -22,7 +22,7 @@ from trunk_generator import trunk_generator
 
 # lsystem + turtle parameters
 d_line = 10
-d_poly = 1
+d_poly = 2
 angles = (22.5,30.5,22.5)
 trop = (0.2,0.0,0.4)
 e = 0.3
