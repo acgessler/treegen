@@ -26,7 +26,7 @@ class tropism_turtle3d:
          caller.
     """
 
-    def __init__(self, d_line, d_polygon, angles, trop, e):
+    def __init__(self, d_line, d_polygon, angles, trop, e, length_decay = 0.95):
         """
         Parameters:
 
@@ -51,6 +51,11 @@ class tropism_turtle3d:
             effect. 0 disables it altogether,
             higher values mean stronger influence
             of the tropism vector on turtle movements.
+
+        length_decay
+            Exponential length decay factor, i.e. the factor by
+            which nested segments are made shorter by. 
+
         """
         self.d_line = d_line
         assert self.d_line > 0
@@ -65,6 +70,7 @@ class tropism_turtle3d:
             if not isinstance(trop, Vec3) else trop
         self.trop.normalize()
         self.e = e
+        self.length_decay = length_decay
 
 
     def get_turtle_path(self, program, start = (0,0,0), start_forward = (0,1,0), start_right= (1,0,0)):
@@ -144,13 +150,13 @@ class tropism_turtle3d:
             if c == 'F':  
                 if is_poly:
                     raise "F not allowed while the turtle is in poly mode"        
-                newPoint = self._compute_next(lstart, lquat, True) 
+                newPoint = self._compute_next(lstart, lquat, True, math.pow(self.length_decay,level)) 
                 output_lines.append((lstart,newPoint,level))
                 lstart = newPoint
             elif c == 'f':          
                 if not is_poly:
                     raise "f not allowed while the turtle is in line mode"    
-                lstart = self._compute_next(lstart, lquat, False) 
+                lstart = self._compute_next(lstart, lquat, False, 1) 
                 current_poly.append(lstart)
             elif c == '-':
                 lquat *= LRotationf(Vec3(0,1,0),-self.angles[2])
@@ -206,10 +212,10 @@ class tropism_turtle3d:
         return processed
 
 
-    def _compute_next(self, lstart, lquat, line):
+    def _compute_next(self, lstart, lquat, line, length_scale):
         dir = lquat.getUp() + self.trop * self.e
         dir.normalize()
-        return lstart + dir * (self.d_line if line else self.d_polygon)
+        return lstart + dir * (self.d_line if line else self.d_polygon)  * length_scale
         
    
 

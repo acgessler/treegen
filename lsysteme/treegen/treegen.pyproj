@@ -28,6 +28,7 @@
     <Compile Include="bracketed_turtle2d.py" />
     <Compile Include="bracketed_turtle2d_test.py" />
     <Compile Include="lsystem.py" />
+    <Compile Include="normals_generator.py" />
     <Compile Include="panda3dtest.py" />
     <Compile Include="panda3dtest_customgeo.py" />
     <Compile Include="stochastic_bracketed_turtle2d_test.py" />
