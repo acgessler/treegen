@@ -6,6 +6,7 @@ from panda3d.core import *
 
 from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.ShowBase import ShowBase
+from direct.filter.CommonFilters import CommonFilters
 
 # pystd
 import itertools
@@ -50,7 +51,7 @@ class TestApp(ShowBase):
                        style=1, fg=(1,1,1,1),
                        pos=(0.2,-0.95), scale = .07)
 
-        base.setBackgroundColor(0.0, 0.0, 0.0) 
+        base.setBackgroundColor(0x74 / 255.0, 0x9a / 255.0, 0xcb / 255.0) 
         base.disableMouse()
 
         turtle = tropism_turtle3d(d_line, d_poly,angles,trop,e)
@@ -63,7 +64,7 @@ class TestApp(ShowBase):
         vmin, vmax = util.find_aabb(itertools.chain(*((a,b) for a,b,c in lines)))   
         center = (vmin+vmax)*0.5    
 
-        trunk_gen = trunk_generator(lines, thickness=2.5, thickness_decay=0.5)
+        trunk_gen = trunk_generator(lines, thickness=5, thickness_decay=0.5)
         stem_quads = trunk_gen.get_geometry()
         
 
@@ -184,6 +185,7 @@ class TestApp(ShowBase):
         myMaterial.setShininess(2.0) 
         myMaterial.setAmbient(VBase4(0.1,0.2,0.1,1)) 
         myMaterial.setDiffuse(VBase4(0.1,0.6,0.0,1))
+        myMaterial.setEmission(VBase4(0.1,0.8,0.0,1))
         node_path_leaves.setMaterial(myMaterial)
         node_path_leaves.setTwoSided(True)
 
@@ -191,6 +193,21 @@ class TestApp(ShowBase):
         dlnp = render.attachNewNode(dlight)
         dlnp.setHpr(0, -60, 0)
         render.setLight(dlnp)
+
+        
+        #node_path.setShaderAuto()
+
+        render.setShaderAuto()
+
+        filters = CommonFilters(base.win, base.cam)
+        filters.setBloom(size = "large", mintrigger = 0.5, intensity=0.4)
+  
+        #filters.setVolumetricLighting(caster=dlight)
+
+        render.setAttrib(LightRampAttrib.makeHdr1())
+        #render.setAntialias(AntialiasAttrib.MMultisample)
+        #render.setShaderAuto(BitMask32.allOn() & ~BitMask32.bit(Shader.BitAutoShaderGlow))
+
 
 if __name__ == '__main__':
     app = TestApp()

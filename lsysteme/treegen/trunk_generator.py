@@ -66,7 +66,7 @@ class trunk_generator:
             right = forward.cross(up)
 
             forward.normalize()
-            forward *= circumf
+            forward *= circumf * 0.5
 
             angle = math.pi * 2.0 / quad_count
             rotater = LOrientationf()
