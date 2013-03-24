@@ -68,13 +68,18 @@ class TestApp(ShowBase):
         
 
         # generate geometry objects to draw the stem quads
-        vdata = GeomVertexData('stem_quads', GeomVertexFormat.getV3(), Geom.UHStatic)     
+        vdata = GeomVertexData('stem_quads', GeomVertexFormat.getV3n3(), Geom.UHStatic)     
         vertex = GeomVertexWriter(vdata, 'vertex')
+        normal = GeomVertexWriter(vdata, 'normal')
         for t1,t2,t3,t4 in stem_quads:          
-            vertex.addData3f(t1 - center)
-            vertex.addData3f(t2 - center)
-            vertex.addData3f(t3 - center)
-            vertex.addData3f(t4 - center)
+            vertex.addData3f(t1[0] - center)
+            normal.addData3f(t1[1]) # nor
+            vertex.addData3f(t2[0] - center)
+            normal.addData3f(t2[1]) # nor
+            vertex.addData3f(t3[0] - center)
+            normal.addData3f(t3[1]) # nor
+            vertex.addData3f(t4[0] - center)
+            normal.addData3f(t4[1]) # nor   
 
         geom = Geom(vdata)
         prim = GeomTriangles(Geom.UHStatic)
