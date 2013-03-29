@@ -7,6 +7,9 @@ class stochastic_lsystem(object):
     """
     Stochastic lsystem - that is, a non-deterministic context-free
     grammar with transition probabilities for each production.
+
+    Tokens enclosed in <>-brackets are copied verbatim and not evaluated (
+    this includes the brackets).
     """
 
     def __init__(self, rules, axiom):
@@ -42,7 +45,7 @@ class stochastic_lsystem(object):
         """
         Return axiom evaluated after n iterations
         """
-        assert(n >= 0)
+        assert n >= 0
         random.seed()
         return ''.join(self._rec_eval(n, self.axiom, []))
 
@@ -52,7 +55,23 @@ class stochastic_lsystem(object):
             out.append(word)
             return out
 
+        verbatim = False
+
         for a in word:
+            if verbatim:
+                out.append(a)
+
+            if a == '<':
+                assert not verbatim 
+                verbatim = True
+                out.append(a)
+                continue
+            elif a == '>':
+                assert verbatim 
+                verbatim = False
+                out.append(a)
+                continue
+
             if not a in self.rules_by_lhs:
                 out.append(a)      
             else:
