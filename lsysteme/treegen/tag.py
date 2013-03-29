@@ -10,17 +10,17 @@ class tag(object):
     """
 
     def __init__(self, position, orientation, name = None):
-        self.position = position
-        self.orientation = orientation
-        self.name = name
+        self.__position = position
+        self.__orientation = orientation
+        self.__name = name
 
     def get_position(self):
-        return self.position
+        return self.__position
 
     def get_orientation(self):
-        return self.orientation
+        return self.__orientation
 
     def get_name(self):
-        return self.name
+        return self.__name
 
 

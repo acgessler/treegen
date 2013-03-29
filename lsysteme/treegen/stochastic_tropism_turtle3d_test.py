@@ -56,9 +56,11 @@ class TestApp(ShowBase):
 
         turtle = tropism_turtle3d(d_line, d_poly,angles,trop,e)
         evaluated = ls.evaluate(iterations)
-        #print evaluated
-        lines, polygons = turtle.get_turtle_path(evaluated,(0,-2,0), start_forward=(0,0,1), start_right=(1,0,0)) 
-        #print lines
+
+        skeleton = turtle.get_tree_skeleton(evaluated,(0,-2,0), start_forward=(0,0,1), start_right=(1,0,0)) 
+        lines = skeleton.get_segments()
+        polygons = skeleton.get_polygons()
+        tags = skeleton.get_tags()
 
         # center
         vmin, vmax = util.find_aabb(itertools.chain(*((a,b) for a,b,c in lines)))   

@@ -37,6 +37,7 @@
     <Compile Include="stochastic_tropism_turtle3d_test.py" />
     <Compile Include="tag.py" />
     <Compile Include="treegen.py" />
+    <Compile Include="tree_skeleton.py" />
     <Compile Include="tropism_turtle3d.py" />
     <Compile Include="util.py" />
   </ItemGroup>

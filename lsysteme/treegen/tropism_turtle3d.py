@@ -1,8 +1,9 @@
 import math
 from panda3d.core import *
 
+from tree_skeleton import tree_skeleton
 
-class tropism_turtle3d:
+class tropism_turtle3d(object):
     """
     3d bracketed tropism turtle with the following instruction set:
 
@@ -13,6 +14,10 @@ class tropism_turtle3d:
 
     F       Move forward in line mode
     f       Move forward in polygon mode
+
+    T       Generate tag for attaching other geometry or to mark tree features. 
+    T<name> Optionally, the tag can be given a name which directly follows
+            the T command. The name must be enclosed in <> brackets.
 
     []      Branch (stack push/pop)
     {}      Start/End polygon mode
@@ -73,9 +78,9 @@ class tropism_turtle3d:
         self.length_decay = length_decay
 
 
-    def get_turtle_path(self, program, start = (0,0,0), start_forward = (0,1,0), start_right= (1,0,0)):
+    def get_tree_skeleton(self, program, start = (0,0,0), start_forward = (0,1,0), start_right= (1,0,0)):
         """ 
-        Gets the output lines and output polygons that the turtle generates 
+        Gets the output lines, output polygons and tags that the turtle generates 
         for a given turtle3d program text.
 
         Parameters:
@@ -96,7 +101,8 @@ class tropism_turtle3d:
             str - For unknown input commands
 
         Returns:
-            ([(Vec3 start,Vec3 end, int branching_level)] output_lines, [(Vec3 vertex)] output_polygons)
+            tree_skeleton instance
+            
         """
 
         # build a coordinate space based on the two given vectors
@@ -126,15 +132,16 @@ class tropism_turtle3d:
 
         output_lines = [] # of (Vec3, Vec3, int)
         output_polygons = [] # of Vec3
+        output_tags = [] # of tag
 
         # interpret the program, collecting lines and polygons in separate lists
-        total = self._rec_eval(program, 0, start, quat, output_lines, output_polygons, 0)
+        total = self._rec_eval(program, 0, start, quat, output_lines, output_polygons, output_tags, 0)
         assert(total == len(program))
 
-        return output_lines, output_polygons
+        return tree_skeleton(output_lines, output_polygons, output_tags)
 
 
-    def _rec_eval(self, program, cursor, start, quat, output_lines, output_polygons, level):
+    def _rec_eval(self, program, cursor, start, quat, output_lines, output_polygons, output_tags, level):
         lstart = Point3(start)
         lquat = LOrientationf(quat)
         lquat.normalize() # normalize the quat each time to prevent numerical errors
@@ -175,7 +182,7 @@ class tropism_turtle3d:
             elif c == '[':
                 if is_poly:
                     raise "[ not allowed while the turtle is in poly mode"
-                cnt = self._rec_eval(program, n + 1, lstart, lquat, output_lines, output_polygons, level + 1) 
+                cnt = self._rec_eval(program, n + 1, lstart, lquat, output_lines, output_polygons, output_tags, level + 1) 
                 n += cnt
                 processed += cnt
             elif c == ']':
