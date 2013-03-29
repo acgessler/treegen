@@ -1,6 +1,6 @@
 import math
 
-class bracketed_turtle2d:
+class bracketed_turtle2d(object):
     """
     Interpreter for the turtle drawing language with the following
     commands:

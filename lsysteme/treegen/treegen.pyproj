@@ -35,6 +35,7 @@
     <Compile Include="stochastic_lsystem.py" />
     <Compile Include="stochastic_tropism_turtle2d_test.py" />
     <Compile Include="stochastic_tropism_turtle3d_test.py" />
+    <Compile Include="tag.py" />
     <Compile Include="treegen.py" />
     <Compile Include="tropism_turtle3d.py" />
     <Compile Include="util.py" />

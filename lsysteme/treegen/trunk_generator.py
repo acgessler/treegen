@@ -2,7 +2,7 @@
 import math
 from panda3d.core import *
 
-class trunk_generator:
+class trunk_generator(object):
     """ 
     Generates geometry for a tree trunk, given a list of trunk segments.
     """

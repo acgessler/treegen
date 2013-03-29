@@ -204,8 +204,8 @@ class TestApp(ShowBase):
   
         #filters.setVolumetricLighting(caster=dlight)
 
-        render.setAttrib(LightRampAttrib.makeHdr1())
-        #render.setAntialias(AntialiasAttrib.MMultisample)
+        #render.setAttrib(LightRampAttrib.makeHdr1())
+        render.setAntialias(AntialiasAttrib.MMultisample)
         #render.setShaderAuto(BitMask32.allOn() & ~BitMask32.bit(Shader.BitAutoShaderGlow))
 
 

@@ -3,7 +3,7 @@
 from lsystem import lsystem
 import random
 
-class stochastic_lsystem:
+class stochastic_lsystem(object):
     """
     Stochastic lsystem - that is, a non-deterministic context-free
     grammar with transition probabilities for each production.

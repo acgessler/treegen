@@ -1,6 +1,6 @@
 
 
-class lsystem:
+class lsystem(object):
     """Simple, deterministic Lindenmayer system (D0)
     
     Takes a deterministic, context free grammar and repeatedly applies
